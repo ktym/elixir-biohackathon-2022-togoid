@@ -34,29 +34,50 @@ authors_short: First Author \emph{et al.}
 
 # Introduction
 
-TogoID[ref] is an open-source identifier conversion service. As part of the BioHackathon Europe 2022, we here report new enhancements and discussions raised.
+TogoID[ref] is an open-source identifier (ID) conversion service. As part of the BioHackathon Europe 2022, we here report new enhancements and discussions raised.
 
 # Results
 
+During the hackathon, we have contacted several participants with use cases. Each dataset stores cross references in various format and we examined feasibility of inclusion to our TogoID one by one. Minimum requirements for inclusion are that (1) the dataset is officially provided by or synchronized to the original data source, (2) entire identifires used in the resource are covered. To include new ID mapping pairs, it is required to update the [TogoID ontology](https://togoid.dbcls.jp/ontology) that defines (1) a category and a class to which the source and target datasets belong if they are not yet registered, and (2) a semantic relationship of the new pair of datasets in both directions if there are no conformable predicate in the existing properties. Finally and most importantly, develop a method to extract ID mappings from the source data and include it in the [TogoID-config](https://github.com/dbcls/togoid-config) repository. When the source or target dataset is newly integrated, the `dataset.yaml` file in the TogoID-config also needs to be updated. To keep ID mappings in TogoID up-to-date, we currently update data every 10 days.
+
 ## Rhea
 
-We have incorporated identifier (ID) mappings from Rhea[ref] to UniProt[ref], Gene Ontology[ref], and PubMed[ref] databases. Note that mappings from Rhea to Enzyme code (EC), ChEBI[ref], and Reactome reaction[ref] were already supported in the TogoID. In the download section on the Rhea website, it provides tab-separated values (TSV) files in addition to RDF data.
+We have incorporated ID mappings from Rhea[ref] to UniProt[ref], Gene Ontology[ref], and PubMed[ref] databases. Note that mappings from Rhea to Enzyme code (EC), ChEBI[ref], and Reactome reaction[ref] were already supported in the TogoID. In the download section on the Rhea website, it provides tab-separated values (TSV) files in addition to RDF data. Because cross references from Rhea to PubMed are only available in the Rhea RDF dump, we developed a SPARQL query to extract ID mappings from the endpoint hosted at the RDF Portal[ref]. Rhea to GO mappings are available both in the TSV file and RDF but we used the TSV file for the time being. For example, we created `config/rhea-go/config.yaml` as follows. This configuration indicates that the `Rhea` to `GO` relation is `TIO_000004` (has GO annotation) and the `GO` to `Rhea` relation is is `TIO_000007` (GO annotation of), original data is updated bimonthly (we uses Dublin Core's Frequency Vocabulary [DCFreq](https://www.dublincore.org/specifications/dublin-core/collection-description/frequency/) terms to specify the update frequency), and the method to extract and format the ID mappings from the source `rhea2go.tsv` file. In this case, we also added the file download method in the `Rakefile` which checks size and timestamp and run the update procedure only when the remote file is renewed.
+
+```
+link:
+  forward: TIO_000004
+  reverse: TIO_000007
+  file: sample.tsv
+update:
+  frequency: Bimonthly
+  method: awk -F '\t' 'FNR!=1 && !a[$2 $3]++{print $1 "\t" gensub("GO:","","g",$4)}' $TOGOID_ROOT/input/rhea/rhea2go.tsv
+```
 
 As for the Rhea to UniProt mapping, it is alternatively included in the UniProt RDF but we decided to use TSV files (`rhea2uniprot_sprot.tsv` and `rhea2uniprot_trembl.tsv.gz`) for TogoID because the mapping data is curated by the Rhea project (it is strange that one file is gzip-compressed but the other is not, though). There are four categories in the Rhea reactions including `undefined`, `left-to-right`, `right-to-left`, and `bidirectional`. Most of the reactions are assigned to the `undefined` category, while there are some cases that curators confirmed the direction (`left-to-right` or `right-to-left`) of the enzymatic reaction of the given UniProt protein and there exists no UniProt protein that is annotated as `bidirectional` so far. For example, the reaction `RHEA:10101` is `left-to-right` that corresponds to four UniProt proteins (`P19835`, `P30122`, `P07882`, and `Q64285`) and the `right-to-left` reaction `RHEA:10102` and the `bidirectional` reaction `RHEA:10103` has not UniProt proteins assigned, while the `undefined` reaction `RHEA:10100` corresponds to 12 UniProt proteins that also includes four proteins assigned to `RHEA:10101` as these reactions are describing the same chemical equation. We decided to include all Rhea IDs regardless of their categories so that user can obtain all available ID mappings while it can also cause ID expansion as a downside, e.g., when a user converts one UniProt protein `P19835` and will obtain two reactions, `RHEA:10100` and `RHEA:10101`, in this case.
 
-Because cross references from Rhea to PubMed are only available in the Rhea RDF dumps, we created a SPARQL query to extract the ID mappings. Rhea to GO mappings are available both in the TSV file and RDF dumps but we used the TSV file for the time being.
-
 ## BridgeDB
 
+[BridgeDB](https://bridgedb.github.io/) is another ID mapping database among genes, proteins, metabolites, metabolic reactions, diseases, complexes, and publications. It provides binary database which can be explored with Java APIs, REST APIs, and the PathVisio pathway editor. The gene and protein mapping data of BridgeDB is splet into species (currently 35 organisms are supported) and other ID mappings for complexes, interactions, metabolites, and publications are provided in separate files. It is offered that TSV dumps of their data to be included in the TogoID so that users can benefit from the graphical user interface to explore. We will continue collaboration in the future.
 
 ## EGA
 
+The European Genome-phenome Archive (EGA)[ref] is a large archive of personal genomic and phenotypic data. It is suggested to host ID mappings among studies, datasets, samples etc. in TogoID. It would be beneficial for biomedical researchers if the EGA data can be reached from external IDs such as PubMed.
+
+- bulk download of ID mappings?
 
 ## Bgee
 
-Bgee[ref] is a gene expression database and we found that it uses Ensembl gene IDs which already suppored in the TogoID. Instead, we 
+Bgee[ref] is a gene expression database to retrive and compare gene expression patterns across multiple animal species. We found that it uses Ensembl gene IDs which already suppored in the TogoID. Instead, we had a discussion to utilize the Bgee data in [TogoDX](https://togodx.dbcls.jp/human/), our integrated database explorer, to search related human genes in each organ. As Bgee uses UBERON[ref] for the anatomical classification and cell lines, a list of genes can be classified hierarchically. We implemented Bgee in the development version of TogoDX by obtaining data from the Bgee SPARQL endpoint. As the expression data in Bgee can be filtered by the developmental stage, age, and sex, it brought us new idea to extend the TogoDX for embedding a complex query interface as a plugin.
 
 # Discussion
+
+We also investigated drug and side effect relations in the [T-ardis](http://www.bioinsilico.org/T-ARDIS/) database. 
+
+and ATC classification
+ATC - PubChem
+Some DBs uses names (labels) of compounds as ID...
+
 
 Convert natural language labels to IDs
 * Multilingual labels
@@ -65,7 +86,8 @@ Map IDs and hierarchical ontologies
 * retrieve all descendant IDs
 * classification enrichment in each category
 
-
+SSSOM (Mapping Commons) https://github.com/mapping-commons/sssom
+Bioregistry (https://www.biorxiv.org/content/10.1101/2022.07.08.499378v3.full)
 
 ## Tables and figures
 
@@ -107,8 +129,7 @@ Possible CiTO typing annotation include:
 
 ## Acknowledgements
 
-Anne Morgat (SIB/Rhea)
-Tarcisio Mendes (Bgee)
-Egon Willighagen and ??? (BridgeDB)
+We appreciate greatful to Dr. Anne Morgat on Rhea, Dr. Tarcisio Mendes on Bgee, Egon Willighagen and ??? on BridgeDB, Marcos Casado Barbero on EGA for their valuable inputs.
+
 
 ## References
