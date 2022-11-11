@@ -56,6 +56,21 @@ update:
 
 As for the Rhea to UniProt mapping, it is alternatively included in the UniProt RDF but we decided to use TSV files (`rhea2uniprot_sprot.tsv` and `rhea2uniprot_trembl.tsv.gz`) for TogoID because the mapping data is curated by the Rhea project (it is strange that one file is gzip-compressed but the other is not, though). There are four categories in the Rhea reactions including `undefined`, `left-to-right`, `right-to-left`, and `bidirectional`. Most of the reactions are assigned to the `undefined` category, while there are some cases that curators confirmed the direction (`left-to-right` or `right-to-left`) of the enzymatic reaction of the given UniProt protein and there exists no UniProt protein that is annotated as `bidirectional` so far. For example, the reaction `RHEA:10101` is `left-to-right` that corresponds to four UniProt proteins (`P19835`, `P30122`, `P07882`, and `Q64285`) and the `right-to-left` reaction `RHEA:10102` and the `bidirectional` reaction `RHEA:10103` has not UniProt proteins assigned, while the `undefined` reaction `RHEA:10100` corresponds to 12 UniProt proteins that also includes four proteins assigned to `RHEA:10101` as these reactions are describing the same chemical equation. We decided to include all Rhea IDs regardless of their categories so that user can obtain all available ID mappings while it can also cause ID expansion as a downside, e.g., when a user converts one UniProt protein `P19835` and will obtain two reactions, `RHEA:10100` and `RHEA:10101`, in this case.
 
+## SwissLipids
+
+New ID mappings from SwissLipids [ref] to ChEBI and HMDB [ref] have also been incorporated. SwissLipids is the first lipid database to be introduced into TogoID, and we added new database category Lipids in the database configuration 'database.yaml'. We plan further inclusion of other lipid-related DBs, which will enrich the ID relation graph in TogoID. As in the case of Rhea, the ID mapping of SwissLipids is also derived from TSV files.
+
+```
+swisslipids:
+  label: SwissLipids
+  catalog: nbdc02026
+  category: Lipids
+  regex: '^SLM:(?<id>\d+)$'
+  prefix: 'http://identifiers.org/slm/SLM:'
+  examples:
+    - ["SLM:000000002","SLM:000000003","SLM:000000006","SLM:000000007","SLM:000000035", "SLM:000000042","SLM:000000043","SLM:000000044", "SLM:000000047","SLM:000000048"]
+```
+
 ## BridgeDB
 
 [BridgeDB](https://bridgedb.github.io/) is another ID mapping database among genes, proteins, metabolites, metabolic reactions, diseases, complexes, and publications. It provides binary database which can be explored with Java APIs, REST APIs, and the PathVisio pathway editor. The gene and protein mapping data of BridgeDB is splet into species (currently 35 organisms are supported) and other ID mappings for complexes, interactions, metabolites, and publications are provided in separate files. It is offered that TSV dumps of their data to be included in the TogoID so that users can benefit from the graphical user interface to explore. We will continue collaboration in the future.
