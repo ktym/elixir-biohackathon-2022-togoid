@@ -66,6 +66,19 @@ The European Genome-phenome Archive (EGA)[ref] is a large archive of personal ge
 
 - bulk download of ID mappings?
 
+## Plant data
+
+Plant research community has difficulties to identify their materials across 
+* phenotype - genotype (variation)
+* Plant materials DB
+  * species - cultivars: ambiguity
+  * stock centers - (gene banks, accsession number, genus)
+  * DOI attached to accession
+  * sample IDs, project IDs
+  * id - synonyms (labels)
+  * biosample
+  
+
 ## Bgee
 
 Bgee[ref] is a gene expression database to retrive and compare gene expression patterns across multiple animal species. We found that it uses Ensembl gene IDs which already suppored in the TogoID. Instead, we had a discussion to utilize the Bgee data in [TogoDX](https://togodx.dbcls.jp/human/), our integrated database explorer, to search related human genes in each organ. As Bgee uses UBERON[ref] for the anatomical classification and cell lines, a list of genes can be classified hierarchically. We implemented Bgee in the development version of TogoDX by obtaining data from the Bgee SPARQL endpoint. As the expression data in Bgee can be filtered by the developmental stage, age, and sex, it brought us new idea to extend the TogoDX for embedding a complex query interface as a plugin.
@@ -89,47 +102,8 @@ Map IDs and hierarchical ontologies
 SSSOM (Mapping Commons) https://github.com/mapping-commons/sssom
 Bioregistry (https://www.biorxiv.org/content/10.1101/2022.07.08.499378v3.full)
 
-## Tables and figures
-
-Tables can be added in the following way, though alternatives are possible:
-
-| Header 1 | Header 2 |
-| -------- | -------- |
-| item 1 | item 2 |
-| item 3 | item 4 |
-
-Table: Note that table caption is automatically numbered.
-
-A figure is added with:
-
-![Caption for BioHackrXiv logo figure](./biohackrxiv.png)
-
-# Other main section on your manuscript level 1
-
-Lists can be added with:
-
-1. Item 1
-2. Item 2
-
-# Citation Typing Ontology annotation
-
-You can use CiTO annotations, as explained in [this BioHackathon Europe 2021 write up](https://raw.githubusercontent.com/biohackrxiv/bhxiv-metadata/main/doc/elixir_biohackathon2021/paper.md) and [this CiTO Pilot](https://www.biomedcentral.com/collections/cito).
-Using this template, you can cite an article and indicate why you cite that article, for instance DisGeNET-RDF [@citesAsAuthority:Queralt2016].
-
-Possible CiTO typing annotation include:
-
-* citesAsDataSource: when you point the reader to a source of data which may explain a claim
-* usesDataFrom: when you reuse somehow (and elaborate on) the data in the cited entity
-* usesMethodIn
-* citesAsAuthority
-* discusses
-* extends
-* agreesWith
-* disagreesWith
-
 ## Acknowledgements
 
-We appreciate greatful to Dr. Anne Morgat on Rhea, Dr. Tarcisio Mendes on Bgee, Egon Willighagen and ??? on BridgeDB, Marcos Casado Barbero on EGA for their valuable inputs.
-
+We appreciate greatful to Dr. Anne Morgat on Rhea, Dr. Tarcisio Mendes on Bgee, Dr. Egon Willighagen and Dr. Tooba Abbassi-Daloii on BridgeDB, Dr. Cyril Pommier and Dr. Marco Brandizi on the Plant data, Dr. Marcos Casado Barbero on EGA for their valuable inputs.
 
 ## References
